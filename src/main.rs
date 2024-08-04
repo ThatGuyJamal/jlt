@@ -1,37 +1,38 @@
-struct Command {
-    name: String,
-    args: Vec<String>,
-    description: String
+#[derive(Debug, PartialEq)]
+struct Command<'a> {
+    name: &'a str,
+    description: &'a str,
 }
 
-impl Command {
-    fn new(name: String, args: Vec<String>, description: String) -> Command {
+impl<'a> Command<'a> {
+    const fn new(name: &'a str, description: &'a str) -> Command<'a> {
         Command {
             name,
-            args,
-            description
+            description,
         }
     }
 
-    fn run(&self) {
-        println!("Running command: {} with args: {:?}", self.name, self.args);
+    fn run(&self, args: Option<Vec<String>>) {
+        println!("Running command: '{}' with args: {:?}", self.name, args);
     }
 }
 
-const CMD_LIST: &[&str] = &["help", "install"];
+const CMD_LIST: [Command; 2] = [
+    Command::new("help", "Display help"),
+    Command::new("install", "Install dependencies"),
+];
 
-fn main() 
-{
-    let args: Vec<String> = std::env::args().collect();
+fn main() {
+    let cmd = std::env::args().nth(1).unwrap(); // The command name we want to call
+    let args: Vec<String> = std::env::args().skip(2).collect(); // The arguments passed to the command
 
-    for arg in args.iter() {
-        let cmd = CMD_LIST.iter().find(|&&c| arg == c);
-        if let Some(c) = cmd {
-            println!("Found command: {}", c);
+    if let Some(command) = CMD_LIST.iter().find(|&c| c.name == cmd) {
+        if args.is_empty() {
+            command.run(None);
         } else {
-            println!("Unknown command: {}", arg);
+            command.run(Some(args));
         }
+    } else {
+        eprintln!("Command not found: {}", cmd);
     }
-
-    println!("")
 }
