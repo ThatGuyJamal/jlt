@@ -1,0 +1,6 @@
+jlt install docker
+
+<exe> [cmd] (args)
+
+1. Setup project and files
+2. Create function for parsing command input
