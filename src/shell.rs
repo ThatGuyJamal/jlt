@@ -37,7 +37,8 @@ pub fn start()
     }
 }
 
-pub fn clear_shell() {
+pub fn clear_shell()
+{
     print!("\x1B[2J\x1B[1;1H");
     println!("==== JLT Shell ====")
 }

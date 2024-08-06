@@ -52,7 +52,7 @@ pub fn handle_install(args: CommandRunArgs)
     let cmd = match detect_distro() {
         distro::Distro::Arch => Command::new("bash")
             .arg("-c")
-            .arg(format!("yay -S --noconfirm {}", package_name))
+            .arg(format!("sudo pacman -S --noconfirm {}", package_name))
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit())
             .spawn(),
@@ -81,5 +81,20 @@ pub fn handle_install(args: CommandRunArgs)
             Err(e) => eprintln!("Failed to wait on child process: {}", e),
         },
         Err(e) => eprintln!("Failed to spawn process: {}", e),
+    }
+}
+
+#[cfg(test)]
+mod tests
+{
+    use super::*;
+
+    #[test]
+    fn test_handle_install_successful_install()
+    {
+        // Assuming you have some way to mock Command
+        let args: CommandRunArgs = vec!["nano".to_string()];
+        let output = std::panic::catch_unwind(|| handle_install(args));
+        assert!(output.is_ok(), "handle_install should handle successful installation");
     }
 }
