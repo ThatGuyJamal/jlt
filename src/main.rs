@@ -1,21 +1,41 @@
 use std::env;
 
-use state::CMD_LIST;
+use state::{CommandRunArgs, CMD_LIST};
 
-mod cmd_handlers;
+mod distro;
+mod handler;
+mod shell;
 mod state;
+mod utils;
 
 fn main()
 {
-    let args: Vec<String> = env::args().collect();
+    let args: CommandRunArgs = env::args().collect();
 
-    if args.len() < 2 {
+    if args.contains(&"--shell".to_string()) {
+        shell::start();
+    } else {
+        // Skip the first argument (the program name) for single-command mode
+        if args.len() < 2 {
+            eprintln!("Error: No command provided. Please specify a command.");
+            return;
+        }
+
+        let cmd_args: CommandRunArgs = args[1..].to_vec();
+
+        run(cmd_args);
+    }
+}
+
+pub fn run(args: CommandRunArgs)
+{
+    if args.is_empty() {
         eprintln!("Error: No command provided. Please specify a command.");
         return;
     }
 
-    let cmd: &String = &args[1];
-    let cmd_args: Vec<String> = args[2..].to_vec();
+    let cmd = &args[0];
+    let cmd_args = args[1..].to_vec();
 
     match CMD_LIST.iter().find(|&&ref c| c.name == cmd.as_str()) {
         Some(command) => command.prepare(cmd_args),

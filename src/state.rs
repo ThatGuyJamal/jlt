@@ -1,20 +1,21 @@
-use crate::cmd_handlers::{handle_help, handle_install};
+use crate::{handler::{handle_help, handle_install}, shell::clear_shell};
 
 pub type CommandRunArgs = Vec<String>;
 pub type CommandRunHandler = fn(CommandRunArgs);
 
 pub const CMD_LIST: &[CommandState] = &[
-    CommandState::new("help", "Display help", 0, 0, handle_help),
-    CommandState::new("install", "Install a program", 1, 1, handle_install),
+    CommandState::new("help", "Useful information about commands and utils of the script", "help [command name]", 0, 1, handle_help),
+    CommandState::new("install", "Uses your system's package manager to install a program", "install [program name]", 1, 1, handle_install),
 ];
 
 #[derive(Debug, PartialEq)]
 pub struct CommandState<'a>
 {
     pub name: &'a str,
-    description: &'a str,
-    min_args: usize,
-    max_args: usize,
+    pub description: &'a str,
+    pub example: &'a str,
+    pub min_args: usize,
+    pub max_args: usize,
     handler: CommandRunHandler,
 }
 
@@ -23,6 +24,7 @@ impl<'a> CommandState<'a>
     const fn new(
         name: &'a str,
         description: &'a str,
+        example: &'a str,
         min_args: usize,
         max_args: usize,
         handler: CommandRunHandler,
@@ -31,6 +33,7 @@ impl<'a> CommandState<'a>
         Self {
             name,
             description,
+            example,
             min_args,
             max_args,
             handler,
@@ -58,6 +61,8 @@ impl<'a> CommandState<'a>
             );
             return;
         }
+
+        clear_shell();
 
         (self.handler)(args);
     }
