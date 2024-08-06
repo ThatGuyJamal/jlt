@@ -15,7 +15,7 @@ fn main()
     }
 
     let cmd: &String = &args[1];
-    let cmd_args = args[2..].to_vec();
+    let cmd_args: Vec<String> = args[2..].to_vec();
 
     match CMD_LIST.iter().find(|&&ref c| c.name == cmd.as_str()) {
         Some(command) => command.prepare(cmd_args),

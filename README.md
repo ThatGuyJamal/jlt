@@ -5,7 +5,10 @@ The goal of my script is to automate common task
 on linux I use for programming. Such as install applications,
 tools, or config file setup defaults.
 
-Disclaimer: Use this project at your own risk. It does modify and change data on your system and I can grantee the code will be 100% bug free. 
+So far this crate doesn't have any dependency's. This is not accident. I'm trying to grow my understanding of the code I write and I found
+the best ways to do that is solve my problems myself.
+
+Disclaimer: Use this project at your own risk. It does modify and change data on your system and I can grantee the code will be 100% bug free.
 
 ## Distro's Supported
 

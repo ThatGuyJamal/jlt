@@ -1,5 +1,5 @@
 [package]
-name = "JamalsLinuxToolBox"
+name = "jlt"
 version = "0.1.0"
 edition = "2021"
 
