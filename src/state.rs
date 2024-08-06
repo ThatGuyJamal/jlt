@@ -1,4 +1,4 @@
-use crate::commands::{handle_help, handle_install};
+use crate::cmd_handlers::{handle_help, handle_install};
 
 pub type CommandRunArgs = Vec<String>;
 pub type CommandRunHandler = fn(CommandRunArgs);

@@ -2,7 +2,7 @@ use std::env;
 
 use state::CMD_LIST;
 
-mod commands;
+mod cmd_handlers;
 mod state;
 
 fn main()
