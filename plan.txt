@@ -1,7 +1,0 @@
-jlt install docker
-
-<exe> [cmd] (args)
-
-1. Add: Setup project and files                         [done]
-2. Add: Create function for parsing command input       [done]
-3. Fix: Just file not taking command arguments          [done]
