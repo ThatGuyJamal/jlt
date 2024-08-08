@@ -1,11 +1,11 @@
 use std::env;
 
-use state::{CommandRunArgs, CMD_LIST};
+use commands::{CommandRunArgs, CMD_LIST};
 
+mod commands;
 mod distro;
 mod handler;
 mod shell;
-mod state;
 mod utils;
 
 fn main()
@@ -37,7 +37,7 @@ pub fn run(args: CommandRunArgs)
     let cmd = &args[0];
     let cmd_args = args[1..].to_vec();
 
-    match CMD_LIST.iter().find(|&&ref c| c.name == cmd.as_str()) {
+    match CMD_LIST.iter().find(|&&ref c| c.name == cmd.as_str() && c.enabled) {
         Some(command) => command.prepare(cmd_args),
         None => eprintln!("Error: Command '{}' not found.", cmd),
     }

@@ -12,6 +12,7 @@ pub const CMD_LIST: &[CommandState] = &[
         0,
         1,
         handle_help,
+        true,
     ),
     CommandState::new(
         "install",
@@ -20,22 +21,31 @@ pub const CMD_LIST: &[CommandState] = &[
         1,
         1,
         handle_install,
+        true,
+    ),
+    CommandState::new(
+        "-ew-z-uninstall",
+        "Uses your system's package manager to uninstall a program",
+        "uninstall [program name]",
+        1,
+        1,
+        |_| {},
+        false,
     ),
 ];
 
 #[derive(Debug, PartialEq)]
-pub struct CommandState<'a>
-{
+pub struct CommandState<'a> {
     pub name: &'a str,
     pub description: &'a str,
     pub example: &'a str,
     pub min_args: usize,
     pub max_args: usize,
     handler: CommandRunHandler,
+    pub enabled: bool,
 }
 
-impl<'a> CommandState<'a>
-{
+impl<'a> CommandState<'a> {
     const fn new(
         name: &'a str,
         description: &'a str,
@@ -43,8 +53,8 @@ impl<'a> CommandState<'a>
         min_args: usize,
         max_args: usize,
         handler: CommandRunHandler,
-    ) -> CommandState<'a>
-    {
+        enabled: bool,
+    ) -> CommandState<'a> {
         Self {
             name,
             description,
@@ -52,11 +62,11 @@ impl<'a> CommandState<'a>
             min_args,
             max_args,
             handler,
+            enabled,
         }
     }
 
-    pub fn prepare(&self, args: CommandRunArgs)
-    {
+    pub fn prepare(&self, args: CommandRunArgs) {
         if args.len() < self.min_args {
             eprintln!(
                 "Error: Command '{}' requires at least {} arguments but {} were provided.",

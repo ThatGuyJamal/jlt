@@ -1,8 +1,17 @@
 use std::process::{Command, Stdio};
 
+use crate::commands::{CommandRunArgs, CMD_LIST};
 use crate::distro::{self, detect_distro};
-use crate::state::{CommandRunArgs, CMD_LIST};
 
+/// Handles the help command.
+///
+/// # Arguments
+///
+/// * `args` - A vector containing the command name as the first element.
+///
+/// # Errors
+///
+/// This function will return an error if the command name is not found in the `CMD_LIST` array.
 pub fn handle_help(args: CommandRunArgs)
 {
     if args.is_empty() {
@@ -52,7 +61,7 @@ pub fn handle_install(args: CommandRunArgs)
     let cmd = match detect_distro() {
         distro::Distro::Arch => Command::new("bash")
             .arg("-c")
-            .arg(format!("sudo pacman -S --noconfirm {}", package_name))
+            .arg(format!("sudo -S pacman -S --noconfirm {}", package_name))
             .stdout(Stdio::inherit())
             .stderr(Stdio::inherit())
             .spawn(),
@@ -60,7 +69,7 @@ pub fn handle_install(args: CommandRunArgs)
             .arg("-c")
             .arg(format!("apt-get install -y {}", package_name))
             .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
+            .stderr(Stdio::inherigs);
             .spawn(),
         distro::Distro::Unknown => {
             eprintln!("Unknown distribution. Cannot install package.");
@@ -82,6 +91,11 @@ pub fn handle_install(args: CommandRunArgs)
         },
         Err(e) => eprintln!("Failed to spawn process: {}", e),
     }
+}
+
+pub fn handle_setup(args: CommandRunArgs)
+{
+    println!("Setup command not implemented yet.");
 }
 
 #[cfg(test)]
