@@ -1,4 +1,4 @@
-use crate::handler::{handle_help, handle_install};
+use crate::handler::{handle_help, handle_install, handle_setup};
 use crate::shell::clear_shell;
 
 pub type CommandRunArgs = Vec<String>;
@@ -15,6 +15,15 @@ pub const CMD_LIST: &[CommandState] = &[
         true,
     ),
     CommandState::new(
+        "setup",
+        "Setup an application on the system",
+        "setup [application name]",
+        1,
+        1,
+        handle_setup,
+        true,
+    ),
+    CommandState::new(
         "install",
         "Uses your system's package manager to install a program",
         "install [program name]",
@@ -24,7 +33,7 @@ pub const CMD_LIST: &[CommandState] = &[
         true,
     ),
     CommandState::new(
-        "-ew-z-uninstall",
+        "uninstall",
         "Uses your system's package manager to uninstall a program",
         "uninstall [program name]",
         1,
@@ -35,7 +44,8 @@ pub const CMD_LIST: &[CommandState] = &[
 ];
 
 #[derive(Debug, PartialEq)]
-pub struct CommandState<'a> {
+pub struct CommandState<'a>
+{
     pub name: &'a str,
     pub description: &'a str,
     pub example: &'a str,
@@ -45,7 +55,8 @@ pub struct CommandState<'a> {
     pub enabled: bool,
 }
 
-impl<'a> CommandState<'a> {
+impl<'a> CommandState<'a>
+{
     const fn new(
         name: &'a str,
         description: &'a str,
@@ -54,7 +65,8 @@ impl<'a> CommandState<'a> {
         max_args: usize,
         handler: CommandRunHandler,
         enabled: bool,
-    ) -> CommandState<'a> {
+    ) -> CommandState<'a>
+    {
         Self {
             name,
             description,
@@ -66,7 +78,8 @@ impl<'a> CommandState<'a> {
         }
     }
 
-    pub fn prepare(&self, args: CommandRunArgs) {
+    pub fn prepare(&self, args: CommandRunArgs)
+    {
         if args.len() < self.min_args {
             eprintln!(
                 "Error: Command '{}' requires at least {} arguments but {} were provided.",

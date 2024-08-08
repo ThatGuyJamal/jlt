@@ -2,6 +2,7 @@ use std::env;
 
 use commands::{CommandRunArgs, CMD_LIST};
 
+mod bash;
 mod commands;
 mod distro;
 mod handler;

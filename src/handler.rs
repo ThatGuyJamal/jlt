@@ -1,5 +1,6 @@
 use std::process::{Command, Stdio};
 
+use crate::bash::{ARCH_SETUP_DOCKER, DEB_SETUP_DOCKER};
 use crate::commands::{CommandRunArgs, CMD_LIST};
 use crate::distro::{self, detect_distro};
 
@@ -17,11 +18,14 @@ pub fn handle_help(args: CommandRunArgs)
     if args.is_empty() {
         println!("Available commands:");
         for cmd in CMD_LIST {
+            if !cmd.enabled {
+                continue;
+            }
             println!("{} - {}", cmd.name, cmd.description);
         }
     } else {
         let cmd_name = &args[0];
-        match CMD_LIST.iter().find(|&&ref c| c.name == cmd_name.as_str()) {
+        match CMD_LIST.iter().find(|&&ref c| c.name == cmd_name && c.enabled) {
             Some(cmd) => {
                 println!("Command: {}", cmd.name);
                 println!("Description: {}", cmd.description);
@@ -57,32 +61,75 @@ pub fn handle_install(args: CommandRunArgs)
 
     let package_name = &args[0];
 
+    let mut cmd = Command::new("bash");
+
     // Determine the appropriate command based on the detected distribution
-    let cmd = match detect_distro() {
-        distro::Distro::Arch => Command::new("bash")
+    match detect_distro() {
+        distro::Distro::Arch => cmd
             .arg("-c")
             .arg(format!("sudo -S pacman -S --noconfirm {}", package_name))
             .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
-            .spawn(),
-        distro::Distro::Debian => Command::new("bash")
+            .stderr(Stdio::inherit()),
+        distro::Distro::Debian => cmd
             .arg("-c")
             .arg(format!("apt-get install -y {}", package_name))
             .stdout(Stdio::inherit())
-            .stderr(Stdio::inherigs);
-            .spawn(),
+            .stderr(Stdio::inherit()),
         distro::Distro::Unknown => {
             eprintln!("Unknown distribution. Cannot install package.");
             return;
         }
     };
 
-    // Handle the result of the command execution
-    match cmd {
+    execute_and_wait(&mut cmd, &format!("Successfully installed package: {}", package_name));
+}
+
+const SETUP_COMMANDS: [&str; 1] = ["docker"];
+
+pub fn handle_setup(args: CommandRunArgs)
+{
+    if args.is_empty() {
+        eprintln!("No command provided for setup.");
+        return;
+    }
+
+    let cmd_name = &args[0];
+    if !SETUP_COMMANDS.contains(&cmd_name.as_str()) {
+        eprintln!("Invalid setup argument: {}", cmd_name);
+        return;
+    }
+
+    if cmd_name == "docker" {
+        let mut cmd = Command::new("bash");
+
+        match detect_distro() {
+            distro::Distro::Arch => cmd
+                .arg("-c")
+                .arg(ARCH_SETUP_DOCKER)
+                .stdout(Stdio::inherit())
+                .stderr(Stdio::inherit()),
+            distro::Distro::Debian => cmd
+                .arg("-c")
+                .arg(DEB_SETUP_DOCKER)
+                .stdout(Stdio::inherit())
+                .stderr(Stdio::inherit()),
+            distro::Distro::Unknown => {
+                eprintln!("Unknown distribution. Cannot install Docker and Docker Desktop.");
+                return;
+            }
+        };
+
+        execute_and_wait(&mut cmd, "Successfully installed Docker and Docker Desktop.");
+    }
+}
+
+fn execute_and_wait(cmd: &mut Command, success_msg: &str)
+{
+    match cmd.spawn() {
         Ok(mut child) => match child.wait() {
             Ok(status) => {
                 if status.success() {
-                    println!("Successfully installed package: {}", package_name);
+                    println!("{}", success_msg);
                 } else {
                     eprintln!("Installation failed with status: {}", status);
                 }
@@ -91,11 +138,6 @@ pub fn handle_install(args: CommandRunArgs)
         },
         Err(e) => eprintln!("Failed to spawn process: {}", e),
     }
-}
-
-pub fn handle_setup(args: CommandRunArgs)
-{
-    println!("Setup command not implemented yet.");
 }
 
 #[cfg(test)]

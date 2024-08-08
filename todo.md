@@ -6,3 +6,4 @@
 - Test for all modules of the script
 - a command to generate my fish config files i personally like using.
 - rollback feature to undo commands
+- test debian based sripts using vm
