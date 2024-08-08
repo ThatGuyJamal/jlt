@@ -1,5 +1,3 @@
-// Key [add:<msg, fix:msg, bug:msg]
-
 - ~~Check if user is on arch or deb. Depending on which, we use different flags/commands.~~
 - Programming language tools command. It will help automate setup for languages on linux. Run one command to install nodejs with nvm setup for you.
 - File based Logging
@@ -7,3 +5,4 @@
 - Real Error Handling
 - Test for all modules of the script
 - a command to generate my fish config files i personally like using.
+- rollback feature to undo commands
